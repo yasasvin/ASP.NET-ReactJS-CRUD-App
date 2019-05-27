@@ -1,0 +1,170 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Products</h2>
+
+<p>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#Prod_modal">
+        Add New Product
+    </button></p>
+<table class="table" id="product_table"></table>
+<!-- Modal -->
+<div class="modal fade" id="Prod_modal" tabindex="-1" role="dialog" aria-labelledby="Create Product" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="CreateCus_Modal">Add Product</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <lebel for="Cus_name"></lebel>
+                    <input type="text" class="form-control" id="ProdId" placeholder="ID " disabled="disabled" />
+                </div>
+                <div class="form-group">
+                    <lebel for="Cus_name"></lebel>
+                    <input type="text" class="form-control" id="ProdName" placeholder="Name" />
+                </div>
+                <div class="form-group">
+                    <lebel for="CusAddress"></lebel>
+                    <input type="text" class="form-control" id="ProdPrice" placeholder="Price" />
+                </div>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="create" onclick="Create();">Save changes</button>
+            <button type="button" class="btn btn-primary" id="btnUpdate" style="display:none;" onclick="Update();">Update</button>
+
+        </div>
+    </div>
+</div>
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        loadData();
+    });
+
+    function loadData() {
+        $("#product_table").html("");
+        $('#btnUpdate').hide();
+        $('#create').show();
+
+        $.ajax({
+            url: "/Product/List",
+
+            type: "GET",
+            contentType: "application/json;charset=UTF-8",
+
+            dataType: "json",
+            success: function (result) {
+                $.each(result, function (key, value) {
+                    console.log(key, value);
+                    $('#product_table').append(
+                        "<tr><td>" + value.ProdId + '</td><td>' + value.ProdName + '</td><td>' + value.ProdPrice + '</td><td><button type="button" onclick="return Delele(' + value.ProdId + ')">Delete</button><button type="button" onclick="return getbyID(' + value.ProdId + ')">Edit</button></td></tr>'
+                     );
+                });
+
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+            }
+        });
+    }
+
+    //Add new
+    function Create()
+    {
+        var Obj = {
+            ProdName: $('#ProdName').val(),
+            ProdPrice: $('#ProdPrice').val(),
+        };
+        $.ajax({
+            url: "/Product/Add",
+            data: JSON.stringify(Obj),
+            type: "POST",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                loadData();
+                $('#Prod_modal').modal('hide');
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+            }
+        });
+    }
+
+    function Update() {
+        var Obj = {
+            ProdId: $('#ProdId').val(),
+            ProdName: $('#ProdName').val(),
+            ProdPrice: $('#ProdPrice').val(),
+        };
+        $.ajax({
+            url: "/Product/Update",
+            data: JSON.stringify(Obj),
+            type: "POST",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                //alert(result);
+                loadData();
+                $('#Prod_modal').modal('hide');
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+            }
+        });
+    }
+
+    //Load Modal for editing cus details  
+    function getbyID(Data) {
+
+        $.ajax({
+            url: "/Product/getbyID/" + Data,
+            typr: "GET",
+            contentType: "application/json;charset=UTF-8",
+            dataType: "json",
+            success: function (result) {
+                //alert(result);
+                $('#ProdId').val(result.ProdId);
+                $('#ProdName').val(result.ProdName);
+                $('#ProdPrice').val(result.ProdPrice);
+
+                $('#Prod_modal').modal('show');
+                $('#btnUpdate').show();
+                $('#create').hide();
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+            }
+        });
+        return false;
+    }
+
+    //function for deleting 
+    function Delele(ID) {
+        var ans = confirm("Are you sure you want to delete this Record?");
+        if (ans) {
+            $.ajax({
+                url: "/Product/Delete/" + ID,
+                type: "POST",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success: function (result) {
+                    loadData();
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+    }
+</script>

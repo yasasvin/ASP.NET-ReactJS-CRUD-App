@@ -1,0 +1,167 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Customers</h2>
+
+<p>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#Add_Customer">
+        Add New Customer
+    </button>
+</p>
+<table class="table" id="Customertable"></table>
+
+<!-- Modal -->
+<div class="modal fade" id="Add_Customer" tabindex="-1" role="dialog" aria-labelledby="Create Customer" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="CreateCus_Modal">Add Customer</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <lebel for="Cus_name"></lebel>
+                    <input type="text" class="form-control" id="CusId" placeholder="ID " disabled="disabled"/>
+                </div>
+                    <div class="form-group">
+                        <lebel for="Cus_name"></lebel>
+                        <input type="text" class="form-control" id="CusName" placeholder="Cus name" />
+                    </div>
+                <div class="form-group">
+                    <lebel for="CusAddress"></lebel>
+                    <input type="text" class="form-control" id="CusAddress" placeholder="Cus Address" />
+                </div>
+                    </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="create" onclick="CreateCus();">Save changes</button>
+                <button type="button" class="btn btn-primary" id="btnUpdate" style="display:none;" onclick="Update();">Update</button>
+
+            </div>
+        </div>
+ </div>
+
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        loadData();
+    });
+
+    function loadData() {
+        $("#Customertable").html("");
+
+        $.ajax({
+            url: "/Customer/List",
+            type: "GET",
+            dataType: "json",
+            success: function (result) {
+                $.each(result, function (key, value) {
+                    console.log(key);
+                    $('#Customertable').append(
+                        "<tr><td>" + value.CusId + '</td><td>' + value.CusName + '</td><td>' + value.CusAddress + '</td><td><button type="button" onclick="return Delele(' + value.CusId + ')">Delete</button><button type="button" onclick="return getbyID(' + value.CusId + ')">Edit</button></td></tr>'
+                     );
+                });
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+            }
+        });
+    }
+    //Add new Customer   
+    function CreateCus() {  
+        var Obj = {  
+            CusName: $('#CusName').val(),
+            CusAddress: $('#CusAddress').val(),
+        };
+        $.ajax({  
+            url: "/Customer/Add",
+            data: JSON.stringify(Obj),  
+            type: "POST",  
+            contentType: "application/json;charset=utf-8",  
+            dataType: "json",  
+            success: function (result) {
+               // alert(Obj.CusName);
+                loadData();  
+               $('#Add_Customer').modal('hide');
+            },  
+            error: function (errormessage) {  
+                alert(errormessage.responseText);  
+            }  
+        });  
+    }
+
+    function Update() {
+        var Obj = {
+            CusId: $('#CusId').val(),
+            CusName: $('#CusName').val(),
+            CusAddress: $('#CusAddress').val(),
+        };
+        $.ajax({
+            url: "/Customer/Update",
+            data: JSON.stringify(Obj),
+            type: "POST",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                //alert(result);
+                loadData();
+                $('#Add_Customer').modal('hide');
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+            }
+        });
+    }
+
+
+    //Load Modal for editing cus details  
+    function getbyID(Data) {
+
+        $.ajax({
+            url: "/Customer/getbyID/" + Data,
+            typr: "GET",
+            contentType: "application/json;charset=UTF-8",
+            dataType: "json",
+            success: function (result) {
+
+                $('#CusId').val(result.CusId);
+                $('#CusName').val(result.CusName);
+                $('#CusAddress').val(result.CusAddress);
+
+                $('#Add_Customer').modal('show');
+                $('#btnUpdate').show();
+                $('#create').hide();
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+            }
+        });
+        return false;
+    }
+
+    //function for deleting 
+    function Delele(ID) {
+        var ans = confirm("Are you sure you want to delete this Record?");
+        if (ans) {
+            $.ajax({
+                url: "/Customer/Delete/" + ID,
+                type: "POST",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success: function (result) {
+                    loadData();
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+    }
+</script>

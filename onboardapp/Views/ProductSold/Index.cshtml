@@ -1,0 +1,217 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Sales</h2>
+
+<p>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal">
+        Add New Sale
+    </button>
+</p>
+<table class="table"id="Store_table"></table>
+<!-- Modal -->
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="Create Product" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="CreateCus_Modal">New Sale</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <lebel for="Cus_name"></lebel>
+                    <input type="text" class="form-control" id="SalesId" placeholder="ID " disabled="disabled" />
+                </div>
+                <div class="form-group">
+                    <lebel for="CusId"></lebel>
+                    <select class="form-control valid" id="CusId" name="Customer"></select>
+                </div>
+                <div class="form-group">
+                    <lebel for="Cus_name"></lebel>
+                    <select class="form-control valid" id="StoreId" name="Store"></select>
+                </div>
+                <div class="form-group">
+                    <lebel for="CusAddress"></lebel>
+                    <select class="form-control" id="ProdId" placeholder="Product" />
+                </div>
+                <div class="form-group">
+                    <lebel for="CusAddress"></lebel>
+                    <input type="date" class="form-control" id="DateSold" placeholder="Date" />
+                </div>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="create" onclick="Create();">Save changes</button>
+            <button type="button" class="btn btn-primary" id="btnUpdate" style="display:none;" onclick="Update();">Update</button>
+
+        </div>
+    </div>
+</div>
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script type="text/javascript">
+
+   $(document).ready(function () {
+        loadData();
+    });
+
+    function loadData() {
+        $("#Store_table").html("");
+        $('#btnUpdate').hide();
+        $('#create').show();
+
+        $.ajax({
+            url: "/ProductSold/List",
+
+            type: "GET",
+            contentType: "application/json;charset=UTF-8",
+
+            dataType: "json",
+            success: function (result) {
+                $("#Store_table").html("");
+
+                $('#Store_table').append("<tr><th>Sale ID</th><th>Product</th><th>Customer</th><th>Store</th><th></th></tr>");
+
+                $.each(result, function (key, value) {
+                    //console.log(key, value);
+                    //alert(value.ProdName.ProdName)
+                    $('#Store_table').append(
+                        "<tr><td>" + value.SalesId + '</td><td>' + value.ProdName.ProdName +'</td><td>'+ value.CusName.CusName +'</td><td>' + value.StoreName.StoreName + '</td><td><button type="button" onclick="return Delele(' + value.SalesId + ')">Delete</button><button type="button" onclick="return getbyID(' + value.SalesId + ')">Edit</button></td></tr>'
+                     );
+
+                    $('#CusId').append("<option value=" +value.CusName.CusId+ ">" + value.CusName.CusName + "</option>");
+                    $('#StoreId').append("<option value=" + value.StoreName.StoreId + ">" + value.StoreName.StoreName + "</option>");
+                    $('#ProdId').append("<option value=" + value.ProdName.ProdId + ">" + value.ProdName.ProdName + "</option>");
+
+                });
+
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+            }
+        });
+    }
+    //Add new
+    function Create()
+    {
+        var CusId = document.getElementById("CusId").value;
+        var CusName = document.getElementById("CusId").selectedIndex;
+        var StoreId= document.getElementById("StoreId").value;
+        var ProdId = document.getElementById("ProdId").value;
+        var date =  document.getElementById("DateSold").value;
+        var DateSold = new Date(date);
+        
+        var Obj = {
+           CusId: CusId,
+           StoreId: StoreId,
+           ProdId:ProdId,
+           DateSold: DateSold,
+        };
+        //alert(DateSold);
+        //alert(Obj);
+
+
+        $.ajax({
+            url: "/ProductSold/Add",
+            data: JSON.stringify(Obj),
+            type: "POST",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                loadData();
+                $('#modal').modal('hide');
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+            }
+        });
+    }
+
+    function Update() {
+        
+        var CusId = document.getElementById("CusId").value;
+        var CusName = document.getElementById("CusId").selectedIndex;
+        var StoreId = document.getElementById("StoreId").value;
+        var ProdId = document.getElementById("ProdId").value;
+        var date = document.getElementById("DateSold").value;
+        var DateSold = new Date(date);
+
+        var Obj = {
+            SalesId: $('#SalesId').val(),
+            CusId: CusId,
+            StoreId: StoreId,
+            ProdId: ProdId,
+            DateSold: DateSold,
+        };
+        $.ajax({
+            url: "/ProductSold/Update",
+            data: JSON.stringify(Obj),
+            type: "POST",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                //alert(result);
+                loadData();
+                $('#Store_modal').modal('hide');
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+            }
+        });
+    }
+
+
+    //Load Modal for editing cus details
+    function getbyID(Data) {
+
+        $.ajax({
+            url: "/ProductSold/getbyID/" + Data,
+            typr: "GET",
+            contentType: "application/json;charset=UTF-8",
+            dataType: "json",
+            success: function (result) {
+                //alert(result);
+
+                $('#SalesId').val(result.SalesId);
+                $("#StoreId").html("");
+                $('#StoreId').append("<option value=" + result.StoreName.StoreId + ">" + result.StoreName.StoreName + "</option>");
+                $("#CusId").html("");
+                $('#CusId').append("<option  value=" + result.CusName.CusId + ">" + result.CusName.CusName + "</option>");
+                $("#ProdId").html("");
+                $('#ProdId').append("<option value=" + result.ProdName.ProdId + ">" + result.ProdName.ProdName + "</option>");
+
+                $('#modal').modal('show');
+                $('#btnUpdate').show();
+                $('#create').hide();
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+            }
+        });
+        return false;
+    }
+    //function for deleting
+    function Delele(ID) {
+        var ans = confirm("Are you sure you want to delete this Record?");
+        if (ans) {
+            $.ajax({
+                url: "/ProductSold/Delete/" + ID,
+                type: "POST",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success: function (result) {
+                    loadData();
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+    }
+</script>
