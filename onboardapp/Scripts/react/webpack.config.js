@@ -1,10 +1,17 @@
 module.exports = {
     mode: 'development',
     context: __dirname,
-    entry: "./index.jsx",
-    output: {
+    entry: 
+    {
+        customer: "./Customer.jsx",
+        product: "./Product.jsx",
+        sales: "./Sales.jsx",
+        store: "./Store.jsx",
+
+    },
+        output: {
         path: __dirname + "/dist",
-        filename: "bundle.js"
+        filename: "[name].bundle.js"
     },
     watch: true,
     module: {
