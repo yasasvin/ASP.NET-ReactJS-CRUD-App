@@ -98,8 +98,8 @@ export class ListingTable extends React.Component {
 
                 <tr key={service.ProdId}>
                     <td className="two wide">{service.SalesId}</td>
-                    <td className="six wide">{service.ProdName}</td>
-                    <td className="ten wide">{service.CusName}</td>
+                    <td className="six wide">{service.ProdName.ProdName}</td>
+                    <td className="ten wide">{service.CusName.CusName}</td>
                     <td className="ten wide">{service.DateSold}</td>
 
 
@@ -111,18 +111,18 @@ export class ListingTable extends React.Component {
                                 <Form ref="form" method="POST" onSubmit={this.update.bind(this,service.ProdId)}>
                                     <Form.Field>
                                     <label>Name</label><br />
-                                    <input id="name_update" type="text" placeholder="Type a name" name="name" placeholder={service.ProdName} 
+                                    <input id="name_update" type="text" placeholder="Type a name" name="name" placeholder={service.ProdName.ProdName} 
                                             onChange={this.handleChange} required minLength="3" maxLength="20" /><br />
                                     </Form.Field>
                                     <Form.Field>
                                         <label>Address</label><br />
-                                        <input id="price_update" placeholder="Type the price" name="Price" placeholder={service.ProdPrice} onChange={this.handleChange} required /><br />
+                                        <input id="price_update" placeholder="Type the price" name="Price" placeholder={service.ProdName.ProdPrice} onChange={this.handleChange} required /><br />
                                     </Form.Field>
                                     <Button type=' '><Icon name="save" />save</Button>
                                 </Form>
                             </Modal.Content>
                         </Modal>
-                        <Button color="mini red" onClick={this.delete.bind(this, service.ProdId)}><Icon name="trash" />Delete</Button>
+                        <Button color="mini red" onClick={this.delete.bind(this, service.ProdName.ProdId)}><Icon name="trash" />Delete</Button>
                         </div>
                     </td>
                 </tr>
