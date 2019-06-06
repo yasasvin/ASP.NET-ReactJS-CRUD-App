@@ -10,7 +10,7 @@ namespace onboardapp.DAL
 {
     public class Onboarding_Context : DbContext
     {
-        public Onboarding_Context() : base("Server=(localDb)\\MSSQLLocalDB;Database=SalesDB; Trusted_Connection=True;MultipleActiveResultSets=True;")
+        public Onboarding_Context() : base("Server=(yourDB Host)\\your MSSQL Database ;Database=SalesonboardingDB; Trusted_Connection=True;MultipleActiveResultSets=True;")
         {
         }
         public DbSet<ProductSold> ProductsSolds { get; set; }
