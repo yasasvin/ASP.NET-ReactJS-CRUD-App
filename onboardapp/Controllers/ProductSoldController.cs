@@ -20,7 +20,33 @@ namespace onboardapp.Controllers
         }
         public JsonResult List()
         {
-            return Json(db.ProductsSolds.ToList(), JsonRequestBehavior.AllowGet);
+            if (db.ProductsSolds != null)
+            {
+                var customers = db.Customers.Select(c => new { c.CusId, c.CusName }).ToList();
+                var products = db.Products.Select(p => new { p.ProdId, p.ProdName }).ToList();
+                var stores = db.Stores.Select(s => new { s.StoreId, s.StoreName }).ToList();
+                var list = db.ProductsSolds.ToList();
+
+                List<Object> array = new List<Object>() { customers, products, stores, list };
+                return Json(array, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new { Success = false }, JsonRequestBehavior.DenyGet);
+        }
+
+        // JSON : get all tables data and fill the dropdowns for adding a new sale
+        public JsonResult GetSalesDetails()
+        {
+            if (db.ProductsSolds != null)
+            {
+                var customers = db.Customers.Select(c => new { c.CusId, c.CusName }).ToList();
+                var products = db.Products.Select(p => new { p.ProdId, p.ProdName }).ToList();
+                var stores = db.Stores.Select(s => new { s.StoreId, s.StoreName }).ToList();
+                var list = db.ProductsSolds.ToList();
+
+                List<Object> array = new List<Object>() { customers, products, stores , list };
+                return Json(array, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new { Success = false }, JsonRequestBehavior.DenyGet);
         }
 
         //Add new Sale

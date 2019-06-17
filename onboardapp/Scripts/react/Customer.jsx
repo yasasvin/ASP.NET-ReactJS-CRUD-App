@@ -26,6 +26,34 @@ export class ListingTable extends React.Component {
         this.loadData();
     }
 
+    add(event) {
+        // ajax call logic     
+        const formData = new FormData(event.target)
+        let dataJSON = {}
+
+        event.preventDefault()
+        
+        for (let entry of formData.entries()) {
+            dataJSON[entry[0]] = entry[1]
+        }
+        
+        console.log(dataJSON)
+        
+        fetch('/Customer/Add', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dataJSON)
+        }).then(response => {
+            response.json().then(data => {
+                console.log(data);
+                window.location.reload();
+            })
+        })
+    }
+
     loadData() {
 
         $.ajax({
@@ -95,6 +123,8 @@ export class ListingTable extends React.Component {
 
         if (serviceList != "") {
             tableData = serviceList.map(service =>
+
+
                 <tr key={service.CusId}>
                     <td className="two wide">{service.CusId}</td>
                     <td className="six wide">{service.CusName}</td>
@@ -128,6 +158,28 @@ export class ListingTable extends React.Component {
         }
         return (
             <React.Fragment>
+
+                    <div>           
+                         <Modal id="add" trigger={<Button color="blue" id="buttonModal">Add a new customer</Button>}  >
+                             <Modal.Header >Add a new customer</Modal.Header>
+                             <Modal.Content>
+                                <Form onSubmit={this.add} ref="form" method="POST">
+                                    <Form.Field>
+                                        <label>Name</label><br />
+                                        <input type="text" placeholder="Type a name" name="CusName" required 
+                                                minlength="3" maxlength="20" /><br />  
+                                    </Form.Field>   
+                                    <Form.Field>                         
+                                        <label>Address</label><br />
+                                        <input placeholder="Type an address" name="CusAddress" required /><br />
+                                    </Form.Field>
+                                    <Button type='submit'><Icon name="save" />save</Button>         
+                                </Form>
+                            </Modal.Content>
+                         </Modal>
+                     </div>      
+
+
                 <table className="ui striped table">
                     <thead>
                         <tr>
@@ -144,9 +196,11 @@ export class ListingTable extends React.Component {
             </React.Fragment>
         )
     }
-}``
+}
 
 ReactDOM.render(
-    <div><h1 className="anim">Customer Details</h1><ListingTable /></div>,
+    <div><h1 className="anim">Customer Details</h1>
+        
+    <ListingTable /></div>,
     document.getElementById('main')
 );

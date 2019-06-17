@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery'; 
-import { Button, Modal, Header, Image, Container, Divider, Grid, Menu, Segment, Icon, Popup , Form, Table, Label } from 'semantic-ui-react';
+import { Button, Modal, Header, Image, Container, Divider, Grid, Menu, Segment, Icon, Popup , Form, Table, Label, Dropdown } from 'semantic-ui-react';
 
 
 export class ListingTable extends React.Component {
@@ -37,8 +37,14 @@ export class ListingTable extends React.Component {
             beforeSend: function(){ // loading...
             }
         }).done((data) => {
+            console.log(data)
             this.setState({
-                serviceList: data
+                customersList: data[0],
+                productsList: data[1],
+                storesList: data[2],
+                serviceList: data[3],
+
+
             })            
         });
     }
@@ -86,21 +92,49 @@ export class ListingTable extends React.Component {
             });
         }
     }
+    fillDropdowncus(list){     
+        let result = [];
+        for (var key in list) {
+            result.push({ key: list[key]["CusId"] , text: list[key]["CusName"] })
+        }        
+        return result;
+    }
+
+    fillDropdownprod(list){     
+        let result = [];
+        for (var key in list) {
+            result.push({ key: list[key]["ProdId"] , text: list[key]["ProdName"] })
+        }        
+        return result;
+    }
+
+    fillDropdownstore(list){     
+        let result = [];
+        for (var key in list) {
+            result.push({ key: list[key]["StoreId"] , text: list[key]["StoreName"] })
+        }        
+        return result;
+    }
 
     render() {
 
         let serviceList = this.state.serviceList;
 
         let tableData = null;
+        let add_sale = null; // modal to add a sale
+
+        
 
         if (serviceList != "") {
             tableData = serviceList.map(service =>
 
                 <tr key={service.ProdId}>
                     <td className="two wide">{service.SalesId}</td>
-                    <td className="six wide">{service.ProdName.ProdName}</td>
+                    <td className="five wide">{service.ProdName.ProdName}</td>
                     <td className="ten wide">{service.CusName.CusName}</td>
+                    <td className="ten wide">{service.StoreName.StoreName}</td>
                     <td className="ten wide">{service.DateSold}</td>
+
 
 
                     <td className="two wide">
@@ -110,12 +144,17 @@ export class ListingTable extends React.Component {
                             <Modal.Content> 
                                 <Form ref="form" method="POST" onSubmit={this.update.bind(this,service.ProdId)}>
                                     <Form.Field>
-                                    <label>Name</label><br />
-                                    <input id="name_update" type="text" placeholder="Type a name" name="name" placeholder={service.ProdName.ProdName} 
-                                            onChange={this.handleChange} required minLength="3" maxLength="20" /><br />
+                                    <label>Select customer</label><br />
+                                    <Dropdown selection options={this.fillDropdowncus(this.state.customersList)} onChange={this.handleChange} name="selectCustomer" placeholder='Select Customer' /><br />
+                                    <label>Select Product</label><br />
+                                    <Dropdown selection options={this.fillDropdownprod(this.state.productsList)} onChange={this.handleChange} name="selectProduct" placeholder='Select Product' /><br />
+
+                                    <label>Select Store</label><br />
+                                    <Dropdown selection options={this.fillDropdownstore(this.state.storesList)} onChange={this.handleChange} name="selecStore" placeholder='Select Store' /><br />
+
                                     </Form.Field>
                                     <Form.Field>
-                                        <label>Address</label><br />
+                                        <label>Price</label><br />
                                         <input id="price_update" placeholder="Type the price" name="Price" placeholder={service.ProdName.ProdPrice} onChange={this.handleChange} required /><br />
                                     </Form.Field>
                                     <Button type=' '><Icon name="save" />save</Button>
@@ -131,6 +170,31 @@ export class ListingTable extends React.Component {
         }
         return (
             <React.Fragment>
+                <div>           
+                    <Modal id="add" trigger={<Button color="blue" id="buttonModal">Add a new customer</Button>}  >
+                        <Modal.Header >Add a new customer</Modal.Header>
+                        <Modal.Content>
+                        <Form onSubmit={this.add} ref="form" method="POST">
+                            <Form.Field> 
+                            <label>Select customer</label><br />
+                                    <Dropdown selection options={this.fillDropdowncus(this.state.customersList)} onChange={this.handleChange} name="selectCustomer" placeholder='Select Customer' /><br />
+                            <label>Select Product</label><br />
+                            <Dropdown selection options={this.fillDropdownprod(this.state.productsList)} onChange={this.handleChange} name="selectProduct" placeholder='Select Product' /><br />
+
+                            <label>Select Store</label><br />
+                            <Dropdown selection options={this.fillDropdownstore(this.state.storesList)} onChange={this.handleChange} name="selecStore" placeholder='Select Store' /><br />
+
+                            </Form.Field>
+                            <Form.Field>
+                                <label>Date</label><br />
+                                <input type="date"  onChange={this.handleDate} name="selectDate" min={this.state.curTime} required /><br />
+                            </Form.Field>
+                            <Button type='submit'><Icon name="save" />save</Button>         
+                        </Form>
+                    </Modal.Content>
+                    </Modal>
+                </div>      
+
                 <table className="ui striped table">
                     <thead>
                         <tr>
@@ -138,6 +202,8 @@ export class ListingTable extends React.Component {
                             <th className="ten wide">Product</th>
                             <th className="ten wide">Customer</th>
                             <th className="two wide">Store</th>
+                            <th className="two wide">Date</th>
+
                         </tr>
                     </thead>
                     <tbody>
@@ -150,6 +216,9 @@ export class ListingTable extends React.Component {
 }``
 
 ReactDOM.render(
-    <div><h1 className="anim">Sales Details</h1><ListingTable /></div>,
+    <div><h1 className="anim">Sales Details</h1>
+    
+    
+    <ListingTable /></div>,
     document.getElementById('main')
 );

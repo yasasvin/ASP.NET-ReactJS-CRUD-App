@@ -10,7 +10,7 @@ namespace onboardapp.DAL
 {
     public class Onboarding_Context : DbContext
     {
-        public Onboarding_Context() : base("Server=(yourDB Host)\\your MSSQL Database ;Database=SalesonboardingDB; Trusted_Connection=True;MultipleActiveResultSets=True;")
+        public Onboarding_Context() : base("Data Source = sql5018.site4now.net; Initial Catalog = DB_A49907_salesDb; Integrated Security = False; User ID = DB_A49907_salesDb_admin; Password=SalesDb123")
         {
         }
         public DbSet<ProductSold> ProductsSolds { get; set; }

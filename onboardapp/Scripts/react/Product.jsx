@@ -66,6 +66,34 @@ export class ListingTable extends React.Component {
 
     }
 
+    add(event) {
+        // ajax call logic     
+        const formData = new FormData(event.target)
+        let dataJSON = {}
+
+        event.preventDefault()
+        
+        for (let entry of formData.entries()) {
+            dataJSON[entry[0]] = entry[1]
+        }
+        
+        console.log(dataJSON)
+        
+        fetch('/Product/Add', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dataJSON)
+        }).then(response => {
+            response.json().then(data => {
+                console.log(data);
+                window.location.reload();
+            })
+        })
+    }
+
     delete(ID) {
 
         var ans = confirm("Are you sure you want to delete this Record?");
@@ -113,14 +141,14 @@ export class ListingTable extends React.Component {
                                             onChange={this.handleChange} required minLength="3" maxLength="20" /><br />
                                     </Form.Field>
                                     <Form.Field>
-                                        <label>Address</label><br />
+                                        <label>Price</label><br />
                                         <input id="price_update" placeholder="Type the price" name="Price" placeholder={service.ProdPrice} onChange={this.handleChange} required /><br />
                                     </Form.Field>
                                     <Button type=' '><Icon name="save" />save</Button>
                                 </Form>
                             </Modal.Content>
                         </Modal>
-                        <Button color="mini red" onClick={this.delete.bind(this, service.ProdId)}><Icon name="trash" />Delete</Button>
+                        <Button color="red" onClick={this.delete.bind(this, service.ProdId)}><Icon name="trash" />Delete</Button>
                         </div>
                     </td>
                 </tr>
@@ -128,10 +156,33 @@ export class ListingTable extends React.Component {
             )
         }
         return (
+            
             <React.Fragment>
+                <div>           
+                    <Modal id="add" trigger={<Button color="blue" id="buttonModal">Add a new Product</Button>}  >
+                        <Modal.Header >Add a new Store</Modal.Header>
+                        <Modal.Content>
+                        <Form onSubmit={this.add} ref="form" method="POST">
+                            <Form.Field>
+                                <label>Name</label><br />
+                                <input type="text" placeholder="Type a name" name="ProdName" required 
+                                        minlength="3" maxlength="20" /><br />  
+                            </Form.Field>   
+                            <Form.Field>                         
+                                <label>Price</label><br />
+                                <input placeholder="Type an address" name="ProdPrice" required /><br />
+                            </Form.Field>
+                            <Button type='submit'><Icon name="save" />save</Button>         
+                        </Form>
+                    </Modal.Content>
+                    </Modal>
+                </div>      
+
                 <table className="ui striped table">
+                
                     <thead>
                         <tr>
+                            
                             <th className="two wide">#</th>
                             <th className="ten wide">Name</th>
                             <th className="ten wide">Price</th>
@@ -148,6 +199,8 @@ export class ListingTable extends React.Component {
 }``
 
 ReactDOM.render(
-    <div><h1 className="anim">Product Details</h1><ListingTable /></div>,
+    <div><h1 className="anim">Product Details</h1>
+
+    <ListingTable /></div>,
     document.getElementById('main')
 );

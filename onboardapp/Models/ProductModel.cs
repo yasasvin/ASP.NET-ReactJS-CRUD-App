@@ -23,6 +23,8 @@ namespace onboardapp.Models
         public int ProdId { get; set; }
         public int CusId { get; set; }
         public int StoreId { get; set; }
+
+        [DataType(DataType.Date)]
         public DateTime DateSold { get; set; }
 
         public virtual Customer CusName { get; set; }

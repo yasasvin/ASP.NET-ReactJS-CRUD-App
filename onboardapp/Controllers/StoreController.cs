@@ -24,6 +24,8 @@ namespace onboardapp.Controllers
             return Json(db.Stores.ToList(), JsonRequestBehavior.AllowGet);
         }
 
+
+
         //Add new Store
         public JsonResult Add(Store newStore)
         {
