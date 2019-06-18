@@ -1,7 +1,5 @@
 # ASP.NET-ReactJS-CRUD-App
 
-# Project Title
-
 This is a CRUD application written with ReactJS and Semantic UI front end. Back end is ASP.Net 4 with a code first model. 
 
 ## Getting Started
